@@ -8,6 +8,15 @@ import tempfile
 from datetime import datetime
 import os
 
+import requests
+
+url = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fes.m.wikipedia.org%2Fwiki%2FArchivo%3ALogo_de_la_Universidad_de_Colima.svg&psig=AOvVaw0papracESnFYXBLDVRRjxk&ust=1730097646946000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCIDmk5H6rYkDFQAAAAAdAAAAABAI'  
+response = requests.get(url)
+
+# Guardar la imagen en el directorio local
+with open('logo.png', 'wb') as f:
+    f.write(response.content)
+
 def obtener_estadisticas_carrera():
     """Obtiene estadísticas detalladas por carrera"""
     query = """
