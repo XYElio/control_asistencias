@@ -10,12 +10,6 @@ import os
 
 import requests
 
-url = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fes.m.wikipedia.org%2Fwiki%2FArchivo%3ALogo_de_la_Universidad_de_Colima.svg&psig=AOvVaw0papracESnFYXBLDVRRjxk&ust=1730097646946000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCIDmk5H6rYkDFQAAAAAdAAAAABAI'  
-response = requests.get(url)
-
-# Guardar la imagen en el directorio local
-with open('logo.png', 'wb') as f:
-    f.write(response.content)
 
 def obtener_estadisticas_carrera():
     """Obtiene estadísticas detalladas por carrera"""
@@ -181,8 +175,7 @@ def generar_reporte_pdf(df, tipo_reporte):
     """Genera un reporte PDF mejorado con estadísticas detalladas, gráficos y formato profesional"""
     class PDF(FPDF):
         def header(self):
-            # Logo y encabezado
-            self.image('logo.png', 10, 8, 33)  # Asegúrate de tener un logo.png
+            # Encabezado
             self.set_font('Arial', 'B', 15)
             self.cell(80)
             self.cell(30, 10, f'Reporte de Asistencia - {tipo_reporte}', 0, 0, 'C')
