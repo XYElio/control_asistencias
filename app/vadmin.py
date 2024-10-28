@@ -681,7 +681,7 @@ def asignar_materia():
     """
     st.subheader("Asignación de Materias")
     
-    # Obtener profesores activos - Note the lowercase column aliases
+    # Obtener profesores activos
     profesores = db.execute_query("""
         SELECT 
             p.Usuario as usuario,  
@@ -710,6 +710,7 @@ def asignar_materia():
         return
     
     with st.form("asignar_materia_form"):
+        # Campos existentes
         profesor = st.selectbox(
             "Profesor",
             options=[(p['usuario'], p['nombre_completo']) for p in profesores],
@@ -725,11 +726,29 @@ def asignar_materia():
         grupo = st.text_input("Grupo")
         ciclo_escolar = st.text_input("Ciclo Escolar (ejemplo: 2024-1)")
         
+        # Campos de horario
+        st.subheader("Horario de Clase")
+        dias_semana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+        dias_seleccionados = st.multiselect("Días de clase", dias_semana)
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            hora_inicio = st.time_input("Hora de inicio", value=None)
+        with col2:
+            hora_fin = st.time_input("Hora de fin", value=None)
+            
+        aula = st.text_input("Aula")
+        
         submitted = st.form_submit_button("Asignar Materia")
         
         if submitted:
-            if not all([grupo, ciclo_escolar]):
+            # Validación de campos
+            if not all([grupo, ciclo_escolar, dias_seleccionados, hora_inicio, hora_fin, aula]):
                 st.error("Por favor complete todos los campos")
+                return
+                
+            if hora_fin <= hora_inicio:
+                st.error("La hora de fin debe ser posterior a la hora de inicio")
                 return
             
             # Verificar si ya existe la asignación
@@ -747,16 +766,27 @@ def asignar_materia():
                 st.error("Esta asignación ya existe")
                 return
             
-            query = """
-                INSERT INTO profesor_materia 
-                (profesor_usuario, materia_id, grupo, ciclo_escolar)
-                VALUES (%s, %s, %s, %s)
-            """
-            if execute_db_operation(query, 
-                                  (profesor[0], materia[0], grupo, ciclo_escolar),
-                                  "asignación de materia"):
-                st.success("Materia asignada exitosamente")
-                update_database()
+            try:
+                # Convertir lista de días a string
+                dias_string = ','.join(dias_seleccionados)
+                
+                # Query actualizado para incluir los campos de horario
+                query = """
+                    INSERT INTO profesor_materia 
+                    (profesor_usuario, materia_id, grupo, ciclo_escolar, 
+                     dias_semana, hora_inicio, hora_fin, aula)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                if execute_db_operation(query, 
+                                     (profesor[0], materia[0], grupo, ciclo_escolar,
+                                      dias_string, hora_inicio, hora_fin, aula),
+                                     "asignación de materia"):
+                    st.success("Materia asignada exitosamente")
+                    update_database()
+                    
+            except Exception as e:
+                st.error(f"Error al asignar la materia: {str(e)}")
+                return
 
 def admin():
     """
