@@ -3,7 +3,7 @@ DROP DATABASE IF EXISTS control_asistencia;
 CREATE DATABASE control_asistencia;
 USE control_asistencia;
 
--- Tabla de usuarios (NUEVA)
+-- Tabla de usuarios 
 CREATE TABLE usuarios (
     Usuario VARCHAR(10) PRIMARY KEY,
     Contrasenia VARCHAR(50) NOT NULL,
